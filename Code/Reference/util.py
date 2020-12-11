@@ -1,12 +1,66 @@
 #%%
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 import os
 import glob
+from tqdm import tqdm
+from sklearn.cluster import AffinityPropagation
 
 """
 Environment 클래스와 Agent 클래스에 포함시킬 수 없거나, 포함시킬 필요가 없는 함수들
 """
+# def train_step(target, enc_hidden):
+    
+# Mapping food to token
+def food_to_token(diet_data, nutrient_data, empty_delete = False, num_empty = 2):
+    '''
+    empty_delete : empty 갯수 지정해서 지정한 갯수 이상 포함된 식단ㅇ들 제거할지 여부. default = False이고, 이 경우 empty로 꽉찬 행만 제거
+    num_empty : empty 갯수
+    '''
+
+    diet_data_np = np.zeros([diet_data.shape[0], diet_data.shape[1]])
+    # Mapping from food to token
+    ## 영양소 data기준으로 식단 data tokenization
+    delete_list = np.array([])
+    for i in tqdm(range(diet_data.shape[0])):
+        empty_list = np.array([])
+
+        for j in range(diet_data.shape[1]):
+            try:
+                # tokenization
+                diet_data_np[i, j] = nutrient_data[nutrient_data['name'] == diet_data.iloc[i, j]].index[0]
+
+                # 각 i번째 식단마다 2, 3, 4, ..., 10, 11, 12, 13 슬롯에 등장한 empty의 갯수를 담은 리스트 생성
+                if j in [2, 3, 4, 5, 6, 9, 10, 11, 12, 13] and diet_data_np[i, j] == 0:
+                    empty_list = np.append(empty_list, j)
+            except:
+                pass
+
+        # i번쨰 식단에 등장한 empty의 갯수가 num_empty보다 클 경우 해당 식단 i를 삭제해야할 대상인 delete_list에 담기
+        if len(empty_list) > num_empty:
+            delete_list = np.append(delete_list, i)
+
+    # 아무식단도 제공되지 않은날
+    if empty_delete == False:
+        non_value_idx = np.where(np.sum(diet_data_np, axis = 1) == 3453)[0] 
+    else:
+        non_value_idx = delete_list     # 점심, 저녁 중 empty가 2번 초과 등장한 경우
+                                        # 식단에 empty가 n번 이상 등장한 경우
+
+    # 아무식단도 제공되지 않은날을 의미하는 row 제거
+    diet_data_np = np.delete(diet_data_np, non_value_idx, axis = 0) 
+
+    return diet_data_np
+
+
+# Mapping token to clsuter id
+def token_to_cluster(diet_data_np, food_ap_label):
+    cluster_data_np = np.empty([0, diet_data_np.shape[1]])
+    for i in range(diet_data_np.shape[0]):
+        cluster_data_np = np.vstack([cluster_data_np, food_ap_label[diet_data_np[i].astype('int')]])
+
+    return cluster_data_np
 
 # 시퀀스를 문장으로 변환해주는 함수
 def sequence_to_sentence(sequence_list, food_dict):
