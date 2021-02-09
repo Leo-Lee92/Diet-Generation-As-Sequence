@@ -9,3 +9,8 @@ Code/.vscode
 Code/AI_Nutrition_GAN
 Code/AI_Nutritionist
 Code/__pycache__
+!Code/Baselines/MIXER/Model.py
+!Code/Baselines/MIXER/train.py
+!Code/Baselines/SCST/Model.py
+!Code/Baselines/SCST/train.py
+!Code/Baselines/SCST/pretrain.py
