@@ -1,7 +1,7 @@
 # 다음 폴더의 csv 파일들 무시
 Data/*
 !Data/foods_ingredient(eng).csv
-!Data/foods_neutrition(eng).csv
+!Data/foods_nutrition(eng).csv
 !Data/foods_type(eng).csv
 !Data/foods_kor_eng.csv
 !Data/human_menu(eng).csv
