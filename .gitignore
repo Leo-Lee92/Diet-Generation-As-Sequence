@@ -8,6 +8,8 @@ Data/*
 Code/Baselines/MIXER/*
 Code/Baselines/SCST/*
 Code/Proposed/*
+!Code/Proposed/Model.py
+!Code/Proposed/train.py
 Code/results
 Code/figures
 Code/.vscode
