@@ -16,19 +16,19 @@ if gpus:
     # Memory growth must be set before GPUs have been initialized
     print(e)
 
-from Preprocessing import *
 from util import *
+from Preprocessing import *
 from Model import * 
-import argparse
-parser = argparse.ArgumentParser(description='gpu, num_epochs와 lr 입력')
-parser.add_argument('--num_epochs', type=int, required=True, help='num_epochs 입력')
-parser.add_argument('--lr', type=float, required=True, help='learning_rate 입력')
-parser.add_argument('--eb', type=int, required=True, help='epoch_of_buffer 입력')
-parser.add_argument('--bs', type=int, required=True, help='buffer_size 입력')
-parser.add_argument('--rs', type=str, required=True, help='reward_shaping 여부 (True or False)')
-parser.add_argument('--alergy', type=str, required=True, help='alergy 여부 (True or False)')
-args = parser.parse_args()
-print(args)
+# import argparse
+# parser = argparse.ArgumentParser(description='gpu, num_epochs와 lr 입력')
+# parser.add_argument('--num_epochs', type=int, required=True, help='num_epochs 입력')
+# parser.add_argument('--lr', type=float, required=True, help='learning_rate 입력')
+# parser.add_argument('--eb', type=int, required=True, help='epoch_of_buffer 입력')
+# parser.add_argument('--bs', type=int, required=True, help='buffer_size 입력')
+# parser.add_argument('--rs', type=str, required=True, help='reward_shaping 여부 (True or False)')
+# parser.add_argument('--alergy', type=str, required=True, help='alergy 여부 (True or False)')
+# args = parser.parse_args()
+# print(args)
 
 import numpy as np
 import copy
@@ -51,17 +51,19 @@ decoder = Decoder(len(food_dict))
 decoder(init_input, init_hidden, init_output)
 
 # Parameter Initialization
-num_epochs = copy.deepcopy(args.num_epochs)
-lr = copy.deepcopy(args.lr)
-epoch_eb = copy.deepcopy(args.eb)
-target_buffer_size = copy.deepcopy(args.bs)
-reward_shaping = copy.deepcopy(args.rs)
-alergy_const = copy.deepcopy(args.alergy)
+# num_epochs = copy.deepcopy(args.num_epochs)
+# lr = copy.deepcopy(args.lr)
+# epoch_eb = copy.deepcopy(args.eb)
+# target_buffer_size = copy.deepcopy(args.bs)
+# reward_shaping = copy.deepcopy(args.rs)
+# alergy_const = copy.deepcopy(args.alergy)
 
-# num_epochs = 5000
-# lr = 1e-3
-# epoch_eb = 5
-# target_buffer_size = 10
+num_epochs = 5000
+lr = 1e-3
+epoch_eb = 5
+target_buffer_size = 10
+reward_shaping = False
+alergy_const = False
 
 buffer_idx = 0
 
@@ -70,11 +72,11 @@ experience_buffer = [ [[] for i in range(target_buffer_size)] for i in range(len
 
 # Define Checkpoint dir
 ## 일단 reward_shaping과 alergy를 같이 고려하는건 생각 안하기로.
-checkpoint_dir = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Proposed/training_lr=" + str(lr) + "_epoch=" + str(num_epochs) + "_eb=" + str(epoch_eb) + "_bs=" + str(target_buffer_size) + "_rs=" + str(reward_shaping) + "_alergy=" + str(alergy_const) + "_TFR"
+# checkpoint_dir = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Proposed/training_lr=" + str(lr) + "_epoch=" + str(num_epochs) + "_eb=" + str(epoch_eb) + "_bs=" + str(target_buffer_size) + "_rs=" + str(reward_shaping) + "_alergy=" + str(alergy_const) + "_TFR"
 
-createFolder(checkpoint_dir)
-checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-checkpoint = tf.train.Checkpoint(encoder = encoder, decoder = decoder)
+# createFolder(checkpoint_dir)
+# checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+# checkpoint = tf.train.Checkpoint(encoder = encoder, decoder = decoder)
 
 per_epoch_rewards = []
 start = time.time()  # 시작 시간 저장
@@ -193,7 +195,9 @@ for epoch in range(num_epochs):
         tf_dataset_update = tf.data.Dataset.from_tensor_slices(new_diet_data_np)
         tf_dataset_update = tf_dataset_update.batch(BATCH_SIZE, drop_remainder = True)
 
-    # 체크포인트에 저장
-    if (epoch + 1) % 100 == 0:
-        checkpoint.save(file_prefix = checkpoint_prefix)
+    # # 체크포인트에 저장
+    # if (epoch + 1) % 100 == 0:
+    #     checkpoint.save(file_prefix = checkpoint_prefix)
 
+
+# %%

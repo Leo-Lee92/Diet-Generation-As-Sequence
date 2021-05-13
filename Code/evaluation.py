@@ -18,7 +18,8 @@ TSNE Mapping
 ## tsne map with generated diets 그리기 (복수의 방법론 비교)
 from os import listdir
 from os.path import isfile, join
-target_dir_list = [path + '/' + subdir for (path, dir, files) in os.walk('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code') for subdir in dir if "tsne" in subdir]
+target_dir_list = [path + '/' + subdir for (path, dir, files) in os.walk('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code') for subdir in dir if "epoch=10000_rs=True" in subdir]
+# target_dir_list = [path + '/' + subdir for (path, dir, files) in os.walk('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code') for subdir in dir if "tsne" in subdir]
 total_nutrient_df = []
 method_label = []
 reward_dist_stack = np.empty([0, 13])
@@ -74,7 +75,7 @@ for cp_dir in target_dir_list:
             next_token = tf.reshape(results[:, 0], shape = (-1, 1))
             sample_seqs = np.concatenate([sample_seqs, next_token], axis = 1)
 
-        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + cp_dir.split('_')[-2] + "_data_np.csv"
+        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '-'.join(cp_dir.split('_')[-2:]) + "_data_np.csv"
         pd.DataFrame(sample_seqs).to_csv(generated_file_name)
 
         # 실제 식단과 생성 식단의 영양상태를 저장하여 t-sne 맵 만들기
@@ -88,7 +89,7 @@ for cp_dir in target_dir_list:
         print(' 정답 :', sequence_to_sentence(np.array(x), food_dict)[0])
         print(' 생성 :', sequence_to_sentence(sample_seqs, food_dict)[0])
 
-        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + cp_dir.split('_')[-2] + "_result.csv"
+        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '-'.join(cp_dir.split('_')[-2:]) + "_result.csv"
         pd.DataFrame(sequence_to_sentence(sample_seqs, food_dict)).to_csv(generated_file_name, encoding = 'utf-8-sig')
 
         true_reward = get_reward_ver2(get_score_vector(x[0], nutrient_data), 0)[0]
@@ -148,7 +149,8 @@ avg_MIP_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr = 
 avg_MIP_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = MIP_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 
 # 3) SCST
-SCST_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/SCST_data_np.csv', index_col = 0)
+# SCST_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/SCST-tsne_data_np.csv', index_col = 0)
+SCST_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/rs=True-SCST_data_np.csv', index_col = 0)
 SCST_data_np = np.array(SCST_result)
 
 # SCST_data_np = food_to_token(SCST_result, nutrient_data)
@@ -162,7 +164,8 @@ avg_SCST_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr =
 avg_SCST_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = SCST_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 
 # 4) MIXER
-MIXER_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/MIXER_data_np.csv', index_col = 0)
+# MIXER_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/MIXER-tsne_data_np.csv', index_col = 0)
+MIXER_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/rs=True-MIXER_data_np.csv', index_col = 0)
 MIXER_data_np = np.array(MIXER_result)
 
 # MIXER_data_np = food_to_token(MIXER_result, nutrient_data)
@@ -176,7 +179,8 @@ avg_MIXER_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr 
 avg_MIXER_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = MIXER_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 
 # 5) TFR
-TFR_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/TFR_data_np.csv', index_col = 0)
+# TFR_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/TFR-tsne_data_np.csv', index_col = 0)
+TFR_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/rs=True-TFR_data_np.csv', index_col = 0)
 TFR_data_np = np.array(TFR_result)
 
 # TFR_data_np = food_to_token(TFR_result, nutrient_data)
@@ -188,6 +192,32 @@ TFR_data_np = np.array(TFR_result)
 # dish_hit_score(TFR_data_np.astype('int'), category_data)
 avg_TFR_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr = TFR_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 avg_TFR_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = TFR_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
+
+# %%
+shapings1 = ['w/o RS', 'w/ RS']
+types1 = ['meal', 'dish']
+method1 = ['TFR', 'SCST', 'MIXER']
+
+meal_hit1 = [[0.99, 0.78, 0.84, 0.99, 0.68, 0.84]]
+dish_hit1 = [[0.96, 0.75, 0.81, 0.96, 0.56, 0.80]]
+the_hits = np.append(meal_hit1, dish_hit1)
+the_methods = np.tile(method1, 4)
+the_shapings = np.tile(np.repeat(shapings1, 3), 2)
+the_types = np.repeat(types1, 6)
+
+
+li = [the_hits, the_methods, the_shapings, the_types]
+the_df = pd.DataFrame(li).T
+the_df.columns = ['value', 'method', 'shaping', 'hit']
+
+sns.barplot(x = 'method', y = 'value', hue = 'hit', data = the_df[the_df['hit'] == 'meal'])
+sns.factorplot(x='shaping', y='value', hue='method', data=the_df, kind='bar')
+
+sns.set(style = 'darkgrid')
+sns.factorplot(x='shaping', y='value', hue='method', data=the_df[the_df['hit'] == 'meal'], kind='bar')
+plt.xlabel(None)
+sns.factorplot(x='shaping', y='value', hue='method', data=the_df[the_df['hit'] == 'dish'], kind='bar')
+plt.xlabel(None)
 
 # %%
 '''

@@ -225,7 +225,10 @@ def train_SEQ2SEQ_TFR(x, x_update, encoder, decoder, lr, reward_shaping = False,
         ## (RL-6) RL 보상 계산
         # alergy관련 rewards 고려한다면
         if alergy_const == "True":
-            alergic_rewards = is_alergy_trigger(real_seqs, alergy_menu_vector, food_dict)
+            print('real_seqs :', real_seqs)
+            print('real_seqs.shape :', real_seqs.shape)
+            alergic_rewards, non_alergy_diets_idx = is_alergy_trigger(real_seqs, alergy_menu_vector, food_dict)
+            print('rewards :', alergic_rewards.sum())
             total_reward_pred = reward_real * (tf.reshape(beta_score, shape = (-1, )) / 15) * alergic_rewards
 
         # alergy관련 rewards 고려안한다면
@@ -250,7 +253,7 @@ def train_SEQ2SEQ_TFR(x, x_update, encoder, decoder, lr, reward_shaping = False,
         # 하나라도 candidate synthetic sequence가 있을 경우
         if len(candidates_idx) > 0: 
             buffer_memory = copy.deepcopy(np.array(x))
-            experiences = pred_seqs[candidates_idx, :]       # synthetic sequence를 뽑아서
+            experiences = pred_seqs[candidates_idx, :]          # synthetic sequence를 뽑아서
             buffer_memory[candidates_idx, :] = experiences      #   x의 candidate_idx 자리에 synthetic sequence를 buffer_memory 넣어준다.
         # candidate synthetic sequence가 전무할 경우
         else:

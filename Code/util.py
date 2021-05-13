@@ -645,14 +645,22 @@ def is_alergy_trigger(diet_batch, alergy_menu_vector, food_dict):
     diet_batch_np[diet_batch_np >= 1] = 1   # 발생빈도가 1이상이면 1로
 
     # 알러지 유발메뉴 포함 식단의 인덱스 (포함 = 1, 비포함 = 0)
-    alergy_diets_idx = np.where(np.dot(diet_batch_np, alergy_menu_vector).flatten() == 1)[0]
+    alergy_diets_idx = np.where(np.dot(diet_batch_np, alergy_menu_vector).flatten() > 0)[0]
+    alergy_free_diets_idx = np.where(np.dot(diet_batch_np, alergy_menu_vector).flatten() == 0)[0]
+    print('alergy_diets_idx :', alergy_diets_idx)
+    print('len(alergy_diets_idx) :', len(alergy_diets_idx))
+    print('alergy_free_diets_idx :', alergy_free_diets_idx)
+    print('len(alergy_free_diets_idx) :', len(alergy_free_diets_idx))
 
     # aa는 알러지 유발메뉴를 포함식단 0점, 유발메뉴 비포함식단 1점주는 전체 식단 샘플갯수만큼의 길이를 각진 onehot 벡터가 됨
     aa = np.ones(len(diet_batch))
     aa[alergy_diets_idx] = 0
-    alergy_trigers = copy.deepcopy(aa)
+    print('aa :', aa)
+    print('aa :', aa.shape)
+    alergy_free = copy.deepcopy(aa)
+    print('np.sum(alergy_free) : ', np.sum(alergy_free))
 
-    return alergy_trigers
+    return alergy_free, alergy_free_diets_idx
 
 def get_score_vector(diet, nutrient_data):
     '''

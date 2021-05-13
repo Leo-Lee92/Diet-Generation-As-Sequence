@@ -44,7 +44,7 @@ for i in range(len(list(tf_dataset))):
     alergy_diets_idx = np.where(np.dot(tmp_diet_np, alergy_menu_vector).flatten() == 1)[0]  
 
     # aa는 알러지 유발메뉴 = 0, 비유발메뉴 = 1로하는, 전체 식단 샘플갯수만큼의 길이를 각진 onehot 벡터가 됨
-    aa = np.ones(len(food_dict))
+    aa = np.ones(len(tf_dataset))
     aa[alergy_diets_idx] = 0
     aaa = aa.reshape(-1, 1)     # aaa는 aa를 컬럼벡터로 만든 것.
     
