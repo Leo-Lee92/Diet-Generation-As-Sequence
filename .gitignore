@@ -1,20 +1,20 @@
 # 다음 폴더의 파일들 무시
 Data/*
 Code/*
-Code/Baselines/MIXER/*
-Code/Baselines/SCST/*
-Code/Proposed/*
-Code/training_log
-Code/results
-Code/figures
-Code/.vscode
-Code/AI_Nutrition_GAN
-Code/AI_Nutritionist
-Code/__pycache__
-Code/(new) tmp.py
-Code/evaluation_new.py
-Code/Preprocessing_new.py
-Code/util_new.py
+# Code/Baselines/MIXER/*
+# Code/Baselines/SCST/*
+# Code/Proposed/*
+# Code/training_log
+# Code/results
+# Code/figures
+# Code/.vscode
+# Code/AI_Nutrition_GAN
+# Code/AI_Nutritionist
+# Code/__pycache__
+# Code/(new) tmp.py
+# Code/evaluation_new.py
+# Code/Preprocessing_new.py
+# Code/util_new.py
 
 # 다음 폴더의 파일들 고려
 !Data (new)/*
@@ -33,10 +33,10 @@ Code/util_new.py
 !Code/train.py
 !Code/util.py
 
-!Code/Proposed/Model.py
-!Code/Proposed/train.py
-!Code/Baselines/MIXER/Model.py
-!Code/Baselines/MIXER/train.py
-!Code/Baselines/SCST/Model.py
-!Code/Baselines/SCST/train.py
-!Code/Baselines/SCST/pretrain.py
+# !Code/Proposed/Model.py
+# !Code/Proposed/train.py
+# !Code/Baselines/MIXER/Model.py
+# !Code/Baselines/MIXER/train.py
+# !Code/Baselines/SCST/Model.py
+# !Code/Baselines/SCST/train.py
+# !Code/Baselines/SCST/pretrain.py
