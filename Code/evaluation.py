@@ -1,120 +1,131 @@
 # %%
-import sys
-sys.path.append("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code")
-from Preprocessing import *
-from util import *
-from Model import *
-import argparse
-parser = argparse.ArgumentParser(description='model,  lr 입력')
-parser.add_argument('--num_epochs', type=int, required=True, help='num_epochs 입력')
-parser.add_argument('--lr', type=float, required=True, help='learning_rate 입력')
-args = parser.parse_args()
-
-# %%
 '''
-TSNE Mapping
+evaluation
 '''
-
-## tsne map with generated diets 그리기 (복수의 방법론 비교)
 from os import listdir
 from os.path import isfile, join
-target_dir_list = [path + '/' + subdir for (path, dir, files) in os.walk('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code') for subdir in dir if "epoch=10000_rs=True" in subdir]
-# target_dir_list = [path + '/' + subdir for (path, dir, files) in os.walk('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code') for subdir in dir if "tsne" in subdir]
+import numpy as np
+# (step 1) Parameter Intialization
+## Initialize the variable to store nutrient vectors of generated diets.
 total_nutrient_df = []
+
+## Initialize the variable to store method labels.
 method_label = []
-reward_dist_stack = np.empty([0, 13])
+
+## Initialize the variable to stack reward distributions
+reward_dist_stack = np.empty([0, 13])   # Here, the number 13 means the number of rewards considered.
 np.random.seed(None)
 
-for cp_dir in target_dir_list:
+## Initialize the number of batches
+batch_num = len(list(tf_dataset))               
 
-    # 사전학습 모델을 활용하여 강화학습
-    # pretrain 폴더에서 특정 시점 체크포인트 복원하기
-    # 변수 초기화를 위한 random seed로서의 input, hidden_state, concat_state 생성
-    encoder = Encoder(len(food_dict), BATCH_SIZE)
-    init_input = np.zeros([BATCH_SIZE, 1])
-    init_hidden = encoder.initialize_hidden_state()
-    init_output, _ = encoder(init_input, init_hidden)
+## Initialize the length of sequence without 'bos' and 'eos'
+seq_len = list(tf_dataset)[0].shape[1] - 2
 
-    # Decoder to predict food sequence
-    decoder = Decoder(len(food_dict))
-    decoder(init_input, init_hidden, init_output)
+# (step 2) Inherit required variables, functions and model from util and Model modules.
+from util import *
+from Model import Sequence_Generator
+from operator import methodcaller
 
-    # (1-3) 체크포인트에 기록된 인스턴스 지정
-    checkpoint = tf.train.Checkpoint(encoder = encoder, decoder = decoder)
-    # checkpoint.restore(tf.train.latest_checkpoint("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Baselines/SCST/pretraining_SCST"))
-    # checkpoint.restore(tf.train.latest_checkpoint("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Baselines/SCST/training_SCST_lr=0.001_epoch=100/0"))
-    # checkpoint.restore(tf.train.latest_checkpoint("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Baselines/MIXER/training_lr=0.001_epoch=1000"))
-    # checkpoint.restore(tf.train.latest_checkpoint("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Proposed/training_lr=0.001_epoch=5000_eb=10_bs=10"))
-    checkpoint.restore(tf.train.latest_checkpoint(cp_dir))
+# (step 3) 
+# Extract every leaf directories (i.e., subdir) with given parameters (e.g., 'epoch=10000_rs=True') and stemed from the node directory '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code'. Then, store the full name of subdir (i.e, path + '/' + subdir) into target_dir_list.
+target_address = 'params'
+target_keyword = 'with_attention'
+target_dir_list = get_TargetDir(target_address, target_keyword)
 
-    encoder = checkpoint.encoder
-    decoder = checkpoint.decoder
+# (step 4) Visualize the results of checkpoints saved in target_dir_list.
+for target_dir in target_dir_list:                                                  
 
+    ## --- (1) Define the required parameters, variables, models etc.
+    # target_dir = target_dir_list[0] # 임시
+    kwargs, food_dict, nutri_dat, inci_dat = loadParams(target_dir)                 # Load all the parameters.
+    food_dict = {int(k) : v for k, v in food_dict.items()}                          # Change the key type of dictionary from str to int.
+    diet_generator = Sequence_Generator(food_dict, nutri_dat, inci_dat, **kwargs)   # Define sequence_generator.
+
+    ## --- (2) Define checkpoint object which includes encoder and decoder object.
+    checkpoint = tf.train.Checkpoint(generator = diet_generator, params = kwargs)
+
+    ## --- (3) Restore checkpoint with the latest object saved at 'target_dir' dirctory.
+    cp_dir = target_dir.replace('params', 'checkpoints')                            # Changes directory from '../params' to '../checkpoints' (target_dir -> cp_dir).
+    checkpoint.restore(tf.train.latest_checkpoint(cp_dir))                          # Restore checkpoint.
+
+    ## --- (4) Define diet generator restored in checkpoint.
+    diet_generator = checkpoint.generator
+
+    ## --- (5) Define varaibles to trace.
     true_total_reward = 0
     gen_total_reward = 0
     # total_nutrient_df_real = pd.DataFrame()
     total_nutrient_df_gen = pd.DataFrame()
 
-    for batch in range(len(list(tf_dataset))):
-        x = list(tf_dataset)[batch]
-        sample_input = x[:, :x.shape[1] - 1]
-        sample_enc_hidden = encoder.initialize_hidden_state()
 
-        # 두 인코더의 컨텍스트 벡터 각각 뽑아주기
-        sample_enc_output, sample_enc_hidden = encoder(sample_input, sample_enc_hidden)
+    print('target_dir :', target_dir)
+    ## --- (6) Run prediction using pretrained parameters of the restored model.
+    for batch in range(batch_num):
 
-        # 두 인코더의 컨텍스트 벡터 연결해주기
-        sample_dec_hidden = copy.deepcopy(sample_enc_hidden)
+        # batch = 0 # 임시        
 
-        sample_seqs = np.empty((0, 1))
-        sample_seqs = np.concatenate([sample_seqs, tf.reshape(sample_input[:, 0], shape = (-1, 1))])
+        # Define a single batch sample.
+        x = list(tf_dataset)[batch]                 
 
-        for j in range(15):
-            sample_outputs, sample_dec_hidden, attention_weigths = decoder(sample_input[:, j], sample_dec_hidden, sample_enc_output)
-            results = np.apply_along_axis(get_action, axis = 1, arr = sample_outputs, option = 'prob')
-            next_token = tf.reshape(results[:, 0], shape = (-1, 1))
-            sample_seqs = np.concatenate([sample_seqs, next_token], axis = 1)
+        # Generate sequences (i.e., synthetic diets).
+        gen_seqs = diet_generator.inference(x)       
+        
+        # Save the generated sequence and its sentence in 'generated_file_name' directory where a file name ends with the suffix '_sequence.csv' and with the suffix '_sentence.csv'. respectively.
+        ## The sequence is a vector of tokens to which the number is allocated, while the sentence is a vector that is composed of words corresponding to tokens.
+        kwargs_vals = list(map(methodcaller("split", '='), cp_dir.split('/')[-2].split('--')))
+        kwargs_vals = np.array(kwargs_vals)[:, 1]
+        kwargs_vals = np.append(np.array(cp_dir.split('/')[-4:-2]), kwargs_vals)
+        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '--'.join(kwargs_vals) + "_sequence.csv"        
+        pd.DataFrame(gen_seqs).to_csv(generated_file_name)
+        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '--'.join(kwargs_vals) + "_sentence.csv"
+        pd.DataFrame(sequence_to_sentence(gen_seqs, food_dict)).to_csv(generated_file_name, encoding = 'utf-8-sig')
 
-        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '-'.join(cp_dir.split('_')[-2:]) + "_data_np.csv"
-        pd.DataFrame(sample_seqs).to_csv(generated_file_name)
-
-        # 실제 식단과 생성 식단의 영양상태를 저장하여 t-sne 맵 만들기
-        nutrient_real = np.apply_along_axis(get_score_vector, axis = 1, arr = np.array(x), nutrient_data = nutrient_data)
-        nutrient_gen = np.apply_along_axis(get_score_vector, axis = 1, arr = sample_seqs, nutrient_data = nutrient_data)
-
-        # total_nutrient_df_real = total_nutrient_df_real.append(pd.DataFrame(nutrient_real))
-        total_nutrient_df_gen = total_nutrient_df_gen.append(pd.DataFrame(nutrient_gen))
-
+        # Check the reward of real and generated diets in first index.
         print(' ')
         print(' 정답 :', sequence_to_sentence(np.array(x), food_dict)[0])
-        print(' 생성 :', sequence_to_sentence(sample_seqs, food_dict)[0])
+        print(' 생성 :', sequence_to_sentence(gen_seqs, food_dict)[0])
 
-        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '-'.join(cp_dir.split('_')[-2:]) + "_result.csv"
-        pd.DataFrame(sequence_to_sentence(sample_seqs, food_dict)).to_csv(generated_file_name, encoding = 'utf-8-sig')
-
-        true_reward = get_reward_ver2(get_score_vector(x[0], nutrient_data), 0)[0]
-        gen_reward = get_reward_ver2(get_score_vector(sample_seqs[0], nutrient_data), 0)[0]
+        true_reward = get_reward_ver2(get_score_vector(x[0], nutrient_data), done = 0, mode = kwargs['add_breakfast'])[0]
+        gen_reward = get_reward_ver2(get_score_vector(gen_seqs[0], nutrient_data), done = 0, mode = kwargs['add_breakfast'])[0]
         print(' ')
         print(' 정답의 보상 :', true_reward)
         print(' 생성의 보상 :', gen_reward)
 
-        mean_true_reward = np.mean(np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_real, done = 0)[:, 0])
-        mean_gen_reward = np.mean(np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_gen, done = 0)[:, 0])
+        # Calculate the (nutrient) score of the real and generated diets.
+        nutrient_real = np.apply_along_axis(get_score_vector, axis = 1, arr = np.array(x), nutrient_data = nutrient_data)
+        nutrient_gen = np.apply_along_axis(get_score_vector, axis = 1, arr = gen_seqs, nutrient_data = nutrient_data)
 
-        # 배치가 여러개 일 때 누적
+        # Get reward-related information of true and generated diet sequences.
+        reward_info_real = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_real, done = 0, mode = kwargs['add_breakfast'])
+        reward_info_gen = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_gen, done = 0, mode = kwargs['add_breakfast'])
+        
+        # Calculate mean rewards of true and generated diet sequences.
+        mean_true_reward = np.mean(reward_info_real[:, 0])
+        mean_gen_reward = np.mean(reward_info_gen[:, 0])
+
+        # Cumulate the mean rewards of true and generated diet sequences (if there are multiple batches).
         true_total_reward += mean_true_reward
         gen_total_reward += mean_gen_reward
 
-        # 생성식단들의 reward
-        reward_dist = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_gen, done = 0)[:, 2].sum(axis = 0).reshape(1, -1)
+        # Sum the number of achieved reward type over every generated diets and define the variables, named reward_dist, which indicates the distribution of rewards in synthetic data.
+        reward_dist = reward_info_gen[:, 2].sum(axis = 0).reshape(1, -1)
         reward_dist_stack = np.append(reward_dist_stack, reward_dist, axis = 0)
 
-    true_mean_reward = true_total_reward / len(list(tf_dataset))
-    gen_mean_reward = gen_total_reward / len(list(tf_dataset))
+        # 실제 식단과 생성 식단의 영양상태를 저장하여 t-sne 맵 만들기
+        # total_nutrient_df_real = total_nutrient_df_real.append(pd.DataFrame(nutrient_real))
+        total_nutrient_df_gen = total_nutrient_df_gen.append(pd.DataFrame(nutrient_gen))
+    
+    # Get mean reward per batch
+    batch_mean_true_reward = true_total_reward / len(list(tf_dataset))
+    batch_mean_gen_reward = gen_total_reward / len(list(tf_dataset))
 
-    print('true_mean_reward :', true_mean_reward)
-    print('gen_mean_reward :', gen_mean_reward)
+    print('batch_mean_true_reward :', batch_mean_true_reward)
+    print('batch_mean_gen_reward :', batch_mean_gen_reward)
 
+    '''
+    TSNE Mapping ('함수화')
+    '''
     total_nutrient_df, method = make_matrix_for_tsne(total_nutrient_df_gen)
 
 # tsne 매핑 결과 보기
