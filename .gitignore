@@ -1,6 +1,9 @@
 # 다음 폴더의 파일들 무시
 Data/*
 Code/*
+Code/tmp.py
+Code/vanila_evaluation.py
+
 # Code/Baselines/MIXER/*
 # Code/Baselines/SCST/*
 # Code/Proposed/*
@@ -32,6 +35,7 @@ Code/*
 !Code/Preprocessing.py
 !Code/train.py
 !Code/util.py
+!Code/README.md
 
 # !Code/Proposed/Model.py
 # !Code/Proposed/train.py
