@@ -42,7 +42,7 @@ Teacher-Forced REINFORCE (TFR)
 # decoder(init_input, init_hidden, init_output)
 
 ## --- (3) Define save_dir which represents the directory where Checkpoint is stored. The directory name consists of the parameters that controls the training of model.
-root_dir = 'training_log/'
+root_dir = './training_log/'
 save_dir = createDir(root_dir, kwargs)
 
 ## --- (4) Check and save the parameters.
