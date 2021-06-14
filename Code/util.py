@@ -764,7 +764,7 @@ def food_to_token(diet_data, nutrient_data, empty_delete = False, num_empty = 2)
     # Delete indices of diets that the number of empty is larger than num_empty.
     diet_data_np = np.delete(diet_data_np, non_value_idx.astype(int), axis = 0) 
 
-    return diet_data_np
+    return tf.cast(diet_data_np, dtype = tf.int32)
 
 # Mapping token to clsuter id
 def token_to_cluster(diet_data_np, food_ap_label):
