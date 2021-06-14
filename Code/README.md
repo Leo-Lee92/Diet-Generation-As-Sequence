@@ -86,7 +86,7 @@ kwargs = {
     'batch_size' : BATCH_SIZE
 }
 ```
-
+***<span style="color:crimson"> ! Note that you have to make clear your anaconda environment shoulde be properly preprared and set right as provided in ```settings.yml``` file. Otherwise, our code may not work.</span>***
 
 ---
 P.S) The code structure given in this repository is as below:

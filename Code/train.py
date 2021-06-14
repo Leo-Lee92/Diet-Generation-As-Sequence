@@ -25,7 +25,7 @@ per_epoch_rewards = []
 target_buffer = [ [[] for i in range(target_buffer_size)] for i in range(len(list(tf_dataset))) ]
 
 # Make the directory that contains the results of training.
-createFolder('/results')
+createFolder('./results')
 
 '''
 Teacher-Forced REINFORCE (TFR)
