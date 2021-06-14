@@ -83,6 +83,8 @@ BATCH_SIZE = diet_data_np.shape[0]
 # num_epochs = 10000
 # lr = 1e-3
 # kwargs = {
+#     # This parameter can be 'korean' or 'english'.
+#     # We recommend you to use 'korean' only as we found the execution unstable when to use 'english'.
 #     'language' : language,
 
 #     # This parameter can be True or False.
