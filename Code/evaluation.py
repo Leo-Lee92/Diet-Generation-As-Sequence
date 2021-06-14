@@ -30,7 +30,7 @@ from operator import methodcaller
 # (step 3) 
 # Extract every leaf directories (i.e., subdir) with given parameters (e.g., 'epoch=10000_rs=True') and stemed from the node directory '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code'. Then, store the full name of subdir (i.e, path + '/' + subdir) into target_dir_list.
 target_address = 'params'
-target_keyword = 'with_attention'
+target_keyword = 'no_attention'
 target_dir_list = get_TargetDir(target_address, target_keyword)
 
 # (step 4) Visualize the results of checkpoints saved in target_dir_list.
@@ -76,9 +76,9 @@ for target_dir in target_dir_list:
         kwargs_vals = list(map(methodcaller("split", '='), cp_dir.split('/')[-2].split('--')))
         kwargs_vals = np.array(kwargs_vals)[:, 1]
         kwargs_vals = np.append(np.array(cp_dir.split('/')[-4:-2]), kwargs_vals)
-        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '--'.join(kwargs_vals) + "_sequence.csv"        
+        generated_file_name = "/results/" + '--'.join(kwargs_vals) + "_sequence.csv"        
         pd.DataFrame(gen_seqs).to_csv(generated_file_name)
-        generated_file_name = "/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/" + '--'.join(kwargs_vals) + "_sentence.csv"
+        generated_file_name = "/results/" + '--'.join(kwargs_vals) + "_sentence.csv"
         pd.DataFrame(sequence_to_sentence(gen_seqs, food_dict)).to_csv(generated_file_name, encoding = 'utf-8-sig')
 
         # Check the reward of real and generated diets in first index.
@@ -148,7 +148,7 @@ avg_real_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr =
 
 # 2) MIP
 # MIP_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/julia_result.csv', index_col = 0)
-MIP_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/available_julia.csv', index_col = 0)
+MIP_result = pd.read_csv('/results/available_julia.csv', index_col = 0)
 MIP_data_np = food_to_token(MIP_result, nutrient_data)
 first_column = np.repeat(first_element, MIP_data_np.shape[0]).reshape(-1, 1)
 last_column = np.repeat(last_element, MIP_data_np.shape[0]).reshape(-1, 1)
@@ -160,8 +160,8 @@ avg_MIP_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr = 
 avg_MIP_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = MIP_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 
 # 3) SCST
-# SCST_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/SCST-tsne_data_np.csv', index_col = 0)
-SCST_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/rs=True-SCST_data_np.csv', index_col = 0)
+# SCST_result = pd.read_csv('/results/SCST-tsne_data_np.csv', index_col = 0)
+SCST_result = pd.read_csv('/results/rs=True-SCST_data_np.csv', index_col = 0)
 SCST_data_np = np.array(SCST_result)
 
 # SCST_data_np = food_to_token(SCST_result, nutrient_data)
@@ -175,8 +175,8 @@ avg_SCST_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr =
 avg_SCST_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = SCST_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 
 # 4) MIXER
-# MIXER_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/MIXER-tsne_data_np.csv', index_col = 0)
-MIXER_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/rs=True-MIXER_data_np.csv', index_col = 0)
+# MIXER_result = pd.read_csv('/results/MIXER-tsne_data_np.csv', index_col = 0)
+MIXER_result = pd.read_csv('/results/rs=True-MIXER_data_np.csv', index_col = 0)
 MIXER_data_np = np.array(MIXER_result)
 
 # MIXER_data_np = food_to_token(MIXER_result, nutrient_data)
@@ -190,8 +190,8 @@ avg_MIXER_meal_hit = np.stack(np.apply_along_axis(meal_hit_score, axis = 1, arr 
 avg_MIXER_dish_hit = np.stack(np.apply_along_axis(dish_hit_score, axis = 1, arr = MIXER_data_np.astype('int'), category_data = category_data)[:, 0], axis = 0).mean()
 
 # 5) TFR
-# TFR_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/TFR-tsne_data_np.csv', index_col = 0)
-TFR_result = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/rs=True-TFR_data_np.csv', index_col = 0)
+# TFR_result = pd.read_csv('/results/TFR-tsne_data_np.csv', index_col = 0)
+TFR_result = pd.read_csv('/results/rs=True-TFR_data_np.csv', index_col = 0)
 TFR_data_np = np.array(TFR_result)
 
 # TFR_data_np = food_to_token(TFR_result, nutrient_data)
@@ -308,7 +308,7 @@ for i, val in enumerate(nut_list):
         ax.annotate("%.1d" % height, (left + width/2, height), ha='center', va='center', fontsize = 7, rotation = 90, xytext = (0, 10), textcoords = 'offset points')
 
     ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    figure_dir = '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/figures/' + plot_name
+    figure_dir = '/figures/' + plot_name
     plt.savefig(figure_dir, bbox_inches='tight')
     plt.clf()
 # %%
@@ -321,12 +321,12 @@ from os import listdir
 from os.path import isfile, join
 
 # 단일 방법론
-# dir_file_name = '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/SCST_eb=None_bs=None_lr=0.001_epoch=5000_rewards.csv'
+# dir_file_name = '/results/SCST_eb=None_bs=None_lr=0.001_epoch=5000_rewards.csv'
 # plot_reward(dir_file_name)
 
 # 복수의 방법론 비교
 # reward plot 그릴 파일 담기
-files = [f for f in listdir('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results') if isfile(join('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results', f))]
+files = [f for f in listdir('/results') if isfile(join('/results', f))]
 # keyword1 = "SCST"
 # keyword2 = "MIXER"
 # keyword3 = "bs=10"
@@ -339,7 +339,7 @@ my_order = [1, 2, 0]
 rearranged_files = [filtered_files[order] for order in my_order] 
 
 # results로 현재 디렉토리 (cwd) 디렉토리 변경 (change directory: chdir)
-os.chdir("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results")
+os.chdir("/results")
 
 trunc_range = 1
 reward_over_methods_df = pd.DataFrame([])
@@ -356,7 +356,7 @@ for each_file in rearranged_files:
     # 순전하게 모든 observation에서의 reward를 보고 싶다면
     reward_over_methods_df = pd.concat([reward_over_methods_df, tmp])
 
-reward_over_methods_df.to_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/total_rewards.csv')
+reward_over_methods_df.to_csv('/results/total_rewards.csv')
 
-plot_reward('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/total_rewards.csv')
+plot_reward('/results/total_rewards.csv')
 # %%

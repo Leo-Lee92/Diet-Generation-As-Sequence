@@ -14,30 +14,30 @@ import re
 # Select language.
 if args.language == 'english':
     ## -- (1) Load feature dataset
-    feature_data = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data (new)/englishDB/new_nutrition.csv', encoding='CP949')
+    feature_data = pd.read_csv('../Data (new)/englishDB/new_nutrition.csv', encoding='CP949')
 
     ## -- (2) Load diet sequence dataset
     # if you want to load the diet data, including breafast meal, which is of 19 length.
     if args.add_breakfast == True:
-        diet_data = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data (new)/englishDB/new_diet (breakfast added).csv', encoding='CP949')
+        diet_data = pd.read_csv('../Data (new)/englishDB/new_diet (breakfast added).csv', encoding='CP949')
         diet_data = diet_data.iloc[:, :-1]
 
     # if you want to load the diet data, without breakfast meal, which is of 14 length.
     else:                       
-        diet_data = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data (new)/englishDB/new_diet (without breakfast).csv', encoding='CP949')
+        diet_data = pd.read_csv('../Data (new)/englishDB/new_diet (without breakfast).csv', encoding='CP949')
 
 elif args.language == 'korean':
     ## -- (1) Load feature dataset
-    feature_data = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data (new)/koreanDB/new_nutrition.csv', encoding='CP949')
+    feature_data = pd.read_csv('../Data (new)/koreanDB/new_nutrition.csv', encoding='CP949')
 
     ## -- (2) Load diet sequence dataset
     # if you want to load the diet data, including breafast meal, which is of 19 length.
     if args.add_breakfast == True:
-        diet_data = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data (new)/koreanDB/new_diet (breakfast added + non_spec-checker).csv', encoding='CP949')    # non-spec_checker
+        diet_data = pd.read_csv('../Data (new)/koreanDB/new_diet (breakfast added + non_spec-checker).csv', encoding='CP949')    # non-spec_checker
         diet_data = diet_data.iloc[:, :-1]
     # if you want to load the diet data, without breakfast meal, which is of 14 length.
     else:                       
-        diet_data = pd.read_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data (new)/koreanDB/new_diet (without breakfast).csv', encoding='CP949')
+        diet_data = pd.read_csv('../Data (new)/koreanDB/new_diet (without breakfast).csv', encoding='CP949')
 else:
     print('Error !. make clear which language of data to use.')
 

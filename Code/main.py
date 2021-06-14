@@ -18,7 +18,7 @@ def initialize_setting():
 
     # System Path setting
     import sys
-    sys.path.append("/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/Proposed")
+    sys.path.append("/Proposed")
     import os    
 
 from util import *

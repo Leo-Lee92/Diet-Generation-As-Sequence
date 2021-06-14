@@ -141,7 +141,7 @@ class diet_sequence_preprocessor():
         print('There were {} mismatched menus in diet_data'.format(len(menus_only_in_dietDB)))
         if len(menus_only_in_dietDB) > 0:
             # Store the menus that do not exist in nutrient data
-            pd.DataFrame(menus_only_in_dietDB).to_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Data/menus_only_in_dietDB.csv', encoding="utf-8-sig")
+            pd.DataFrame(menus_only_in_dietDB).to_csv('../Data/menus_only_in_dietDB.csv', encoding="utf-8-sig")
 
             # Replace the values with 'empty', that exist in diet_data but not in nutrient_data.
             empty_filled_diet_data = diet_data.replace(menus_only_in_dietDB, 'empty')
@@ -219,7 +219,7 @@ import numpy as np
 import re
 def get_TargetDir(target_address, target_keyword):
     # Set root directory
-    root_dir = '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/training_log'
+    root_dir = '/training_log'
 
     # Search every subdirectories which contain 'target_address' and define it as 'target_dir_list'.
     target_dir_list = [path + '/' + subdir for (path, dir, files) in os.walk(root_dir) for subdir in dir if target_address in subdir]
@@ -611,7 +611,7 @@ def plot_reward(dir_reward_df):
         # plt.legend(bbox_to_anchor=(1.05, 1), loc='lower right', borderaxespad=0.)
         plt.legend(loc='lower right', title = 'method')
 
-        figure_dir = '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/figures/training_reward.png'
+        figure_dir = '/figures/training_reward.png'
         plt.axhline(y = 9.29, color = "#d62728", linestyle = "-")
         plt.savefig(figure_dir, bbox_inches='tight')
     else:
@@ -655,7 +655,7 @@ def tsne_plot(tsne_values, method_label):
     colors = ["#d62728", "#1f77b4", "#ff7f0e", "#2ca02c"]
     sns.set_palette(sns.color_palette(colors))
     sns.scatterplot(data = tsne_df, x = "x", y = "y", hue = "method", style = "method", s = 20, alpha = .5)
-    figure_dir = '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/figures/tsne_mapping_plot.png'
+    figure_dir = '/figures/tsne_mapping_plot.png'
     plt.savefig(figure_dir, bbox_inches='tight')
 
 def rewards_matrix(epoch, rewards):
@@ -673,7 +673,7 @@ def rewards_matrix(epoch, rewards):
     return per_epoch_rewards
 
 def save_reward_df(reward_df, model, eb, bs, lr, num_epochs):
-    dir_file_name = '/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Generation/Code/results/' + model + '_eb=' + str(eb) + '_bs=' + str(bs) + '_lr=' + str(lr) + '_epoch=' + str(num_epochs) + '_rewards.csv'
+    dir_file_name = '/results/' + model + '_eb=' + str(eb) + '_bs=' + str(bs) + '_lr=' + str(lr) + '_epoch=' + str(num_epochs) + '_rewards.csv'
     if not os.path.exists(dir_file_name):
         reward_df.to_csv(dir_file_name, index=False, mode='w')
     else:
