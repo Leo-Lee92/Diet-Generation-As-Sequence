@@ -2,6 +2,7 @@
 # Let's import instances (e.g., global variables, functions) from the following modules: {'Preprocessing', 'Model'}
 ## We inherits global variables, such as 'incidence_data', 'BATCH_SIZE' and 'food_dict', from Preprocessing.
 ## We inherits model instances (i.e., classes functionally related to model), such as 'decoder', 'encdoer' and 'sequence_generator', from Model.
+from Code.util import createFolder
 from util import *
 from Model import Sequence_Generator
 from Preprocessing import food_dict, nutrient_data, incidence_data, tf_dataset, tf_dataset_update, kwargs
@@ -24,6 +25,9 @@ buffer_idx = 0
 per_epoch_rewards = []
 target_buffer = [ [[] for i in range(target_buffer_size)] for i in range(len(list(tf_dataset))) ]
 
+
+# Make the directory that contains the results of training.
+createFolder(results)
 
 '''
 Teacher-Forced REINFORCE (TFR)
