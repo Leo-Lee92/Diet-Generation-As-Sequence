@@ -13,7 +13,6 @@ import csv
 import time
 
 # Parameter (2) Constant Parameter Initialization
-add_breakfast = kwargs['add_breakfast']
 num_epochs = kwargs['num_epochs']
 lr = kwargs['lr']
 batch_size = kwargs['batch_size']
@@ -101,8 +100,8 @@ for epoch in range(num_epochs):
         batch_num += 1
 
         # (Full batch) Store nutrition scores and rewards of synthetic diets generated at each batch.
-        scores = get_score_matrix(pred_seqs_all, food_dict, nutrient_data)
-        rewards = np.apply_along_axis(get_reward_ver2, arr = scores, axis = 1, done = 0, mode = add_breakfast)[:, 0]
+        scores = get_score_pandas(pred_seqs_all, food_dict, nutrient_data)
+        rewards = np.apply_along_axis(get_reward_ver2, arr = scores, axis = 1, done = 0)[:, 0]
 
         # (Batch) Store nutrition scores and rewards of synthetic diets generated at each batch.
         # mean_rewards = np.mean(rewards)
@@ -117,7 +116,7 @@ for epoch in range(num_epochs):
         buffer_idx += 1
 
     # Update on-training dataset using target_buffer which is composed of synthetic diets.
-    tf_dataset_update  = update_dataset(epoch, batch_size, target_buffer_update, target_buffer, tf_dataset_update, x, food_dict, nutrient_data, kwargs['add_breakfast'])
+    tf_dataset_update  = update_dataset(epoch, batch_size, target_buffer_update, target_buffer, tf_dataset_update, x, food_dict, nutrient_data)
 
     # Store the checkpoint.
     if (epoch + 1) % 100 == 0:
@@ -144,10 +143,10 @@ for epoch in range(num_epochs):
 
         # 매 에포크 별 SL & RL 생성 결과 확인
         print('REAL 시퀀스 :', sequence_to_sentence(real_seqs_all, food_dict)[0])
-        print('REAL 시퀀스의 영양수준:', get_reward_ver2(get_score_vector(real_seqs_all[0], nutrient_data), done = 0, mode = add_breakfast)[0])
+        print('REAL 시퀀스의 영양수준:', get_reward_ver2(get_score_vector(real_seqs_all[0], nutrient_data), done = 0)[0])
         print(' ')
         print('생성 시퀀스 :', sequence_to_sentence(pred_seqs_all, food_dict)[0])
-        print('생성 시퀀스의 영양수준:', get_reward_ver2(get_score_vector(pred_seqs_all[0], nutrient_data), done = 0, mode = add_breakfast)[0])
+        print('생성 시퀀스의 영양수준:', get_reward_ver2(get_score_vector(pred_seqs_all[0], nutrient_data), done = 0)[0])
         print(' ')
 
         # Calculate the (nutrient) score of the real and generated diets.
@@ -155,8 +154,8 @@ for epoch in range(num_epochs):
         nutrient_gen = np.apply_along_axis(get_score_vector, axis = 1, arr = pred_seqs_all, nutrient_data = nutrient_data)
 
         # Get reward-related information of true and generated diet sequences.
-        reward_info_real = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_real, done = 0, mode = kwargs['add_breakfast'])
-        reward_info_gen = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_gen, done = 0, mode = kwargs['add_breakfast'])
+        reward_info_real = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_real, done = 0)
+        reward_info_gen = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_gen, done = 0)
 
         # Calculate mean rewards of true and generated diet sequences.
         mean_true_reward = np.mean(reward_info_real[:, 0])

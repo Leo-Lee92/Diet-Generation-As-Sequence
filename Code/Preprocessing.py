@@ -11,41 +11,19 @@ import copy
 import re
 
 # Load required dataset
-# Select language.
-if args.language == 'english':
-    ## -- (1) Load feature dataset
-    feature_data = pd.read_csv('../Data (new)/englishDB/new_nutrition.csv', encoding='CP949')
+## -- (1) Load feature dataset
+feature_data = pd.read_csv('../Data (new)/koreanDB/final_new_nutrition.csv', encoding='CP949')
 
-    ## -- (2) Load diet sequence dataset
-    # if you want to load the diet data, including breafast meal, which is of 19 length.
-    if args.add_breakfast == True:
-        diet_data = pd.read_csv('../Data (new)/englishDB/new_diet (breakfast added).csv', encoding='CP949')
-        diet_data = diet_data.iloc[:, :-1]
-
-    # if you want to load the diet data, without breakfast meal, which is of 14 length.
-    else:                       
-        diet_data = pd.read_csv('../Data (new)/englishDB/new_diet (without breakfast).csv', encoding='CP949')
-
-elif args.language == 'korean':
-    ## -- (1) Load feature dataset
-    feature_data = pd.read_csv('../Data (new)/koreanDB/new_nutrition.csv', encoding='CP949')
-
-    ## -- (2) Load diet sequence dataset
-    # if you want to load the diet data, including breafast meal, which is of 19 length.
-    if args.add_breakfast == True:
-        diet_data = pd.read_csv('../Data (new)/koreanDB/new_diet (breakfast added + non_spec-checker).csv', encoding='CP949')    # non-spec_checker
-        diet_data = diet_data.iloc[:, :-1]
-    # if you want to load the diet data, without breakfast meal, which is of 14 length.
-    else:                       
-        diet_data = pd.read_csv('../Data (new)/koreanDB/new_diet (without breakfast).csv', encoding='CP949')
-else:
-    print('Error !. make clear which language of data to use.')
+## -- (2) Load diet sequence dataset
+# if you want to load the diet data, including breafast meal, which is of 19 length.
+diet_data = pd.read_csv('../Data (new)/koreanDB/final_new_diet (breakfast added + non_spec-checker).csv', encoding='CP949')    # non-spec_checker
 
 # Define parameters required for preprocessing
-preprocessing_kwargs = {    
+preprocessing_kwargs = {
     'sequence_data' : diet_data,
     'feature_data' : feature_data,
-    
+    'integrate' : False,    
+
     # Possible parameter list : ['or', 'arrange', 'correct1', 'correct2']
     'DB_quality' : 'correct2'
 }
@@ -68,10 +46,8 @@ incidence_data = diet_to_incidence(diet_data_np, food_dict)
 BATCH_SIZE = diet_data_np.shape[0]
 
 # # Variable Parameter Initialization Ver.2 (If you pass the paremeters at Jupyter interactive level.)
-# language = 'korean'
-# add_breakfast = True
 # network = 'GRU' 
-# attention =  False 
+# attention =  True 
 # embed_dim = 128
 # fc_dim = 64
 # learning = 'off-policy'
@@ -142,15 +118,6 @@ BATCH_SIZE = diet_data_np.shape[0]
 
 # Define the argments which are passed to model and used in training procedure.
 kwargs = {
-    'language' : args.language,
-
-    # This parameter can be True or False.
-    # If it is set to be True, then the length of sequence is 21.
-    # On the other hand, if it is set to be False, the length of sequence is 16.
-    # The mode of get_reward_ver2() changes according to this parameter as well.
-    ## Possible parameter list = [True, False]
-    'add_breakfast' : args.add_breakfast,
-
     # This parameter can be 'GRU' or 'LSTM'.
     ## Possible parameter list = ['GRU', 'LSTM']
     'fully-connected_layer' : args.network, 

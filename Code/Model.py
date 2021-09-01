@@ -1,6 +1,6 @@
 
 # %%
-from util import get_action, get_score_matrix, get_reward_ver2, get_score_vector, make_synthetic_target
+from util import get_action, get_score_pandas, get_reward_ver2, get_score_vector, make_synthetic_target
 
 import tensorflow as tf
 import numpy as np
@@ -116,7 +116,7 @@ class Decoder(tf.keras.Model):
 
             # (step 1) Run attention in terms of the current dec_hidden and return context vector.
             context_vector, attention_weights = self.Attention(dec_hidden, enc_output)
-    
+
             # (step 2) Concat context vector with embedding vector x.
             x = tf.concat([tf.expand_dims(context_vector, axis = 1), x], axis = -1)
 
@@ -159,7 +159,6 @@ class Sequence_Generator(tf.keras.Model):
         # Inherits the parameters from user-defined parameter list.
         self.policy_learning_type = kwargs['learning']
         self.policy_type = kwargs['policy']
-        self.add_breakfast = kwargs['add_breakfast']
         self.lr = kwargs['lr']
 
 
@@ -219,6 +218,7 @@ class Sequence_Generator(tf.keras.Model):
 
                     ## (step 1) predict next token.
                     preds, dec_hidden, _ = self.decoder(inputs[:, t], dec_hidden, enc_output)
+
                     results = np.apply_along_axis(get_action, axis = 1, arr = np.array(preds), option = self.policy_type)
                     predicted_token = tf.reshape(results[:, 0], shape = (-1, 1))
 
@@ -272,18 +272,14 @@ class Sequence_Generator(tf.keras.Model):
             '''
             Compute reward
             '''
-            ## (step 1) compute nutrition score of real diets.
-            # nutrition_real = get_score_matrix(real_seqs, self.food_dict, self.nutrient_data)
-            nutrition_gen = get_score_matrix(pred_seqs, self.food_dict, self.nutrient_data)
+            ## (step 1) compute nutrition score of predicted diets.
+            nutrition_gen = get_score_pandas(pred_seqs, self.food_dict, self.nutrient_data)
 
             ## (step 2) compute reward using nutrition score.
-            # reward_real = np.apply_along_axis(get_reward_ver2, arr = nutrition_real, axis = 1, done = 0, mode = self.add_breakfast)
-            # reward_real = tf.cast(reward_real[:, 0].astype(float), dtype = tf.float32)
-            reward_gen = np.apply_along_axis(get_reward_ver2, arr = nutrition_gen, axis = 1, done = 0, mode = self.add_breakfast)
+            reward_gen = np.apply_along_axis(get_reward_ver2, arr = nutrition_gen, axis = 1, done = 0)
             reward_gen = tf.cast(reward_gen[:, 0].astype(float), dtype = tf.float32)
 
             ## (step 3) compute final reward adding beta score.
-            # final_reward = reward_real * (tf.reshape(beta_score, shape = (-1, )) / tar_len)
             final_reward = reward_gen * (tf.reshape(beta_score, shape = (-1, )) / tar_len)
 
             '''
@@ -317,7 +313,7 @@ class Sequence_Generator(tf.keras.Model):
 
         return real_seqs, batch_loss, pred_seqs, _, _, synthetic_target, _
     
-    def inference(self, input_seqs):
+    def inference(self, input_seqs, return_attention = True):
         '''
         input_seqs : encoder에 입력되는 input_seqs 데이터
         encoder, decoder : checkpoint에 저장되어 있는 사전에 학습된 encoder, decoder 모델 및 파라미터. initialized status로 입력받아야 함.
@@ -334,13 +330,18 @@ class Sequence_Generator(tf.keras.Model):
         gen_seqs = np.empty((0, 1))
         gen_seqs = np.concatenate([gen_seqs, tf.reshape(input_seqs[:, 0], shape = (-1, 1))])
 
+        attention = []
         # Predict next token at each step based on the previously predicted tokens until 'eos' token is sampled.
         for j in range(input_seq_len):
-            outputs, dec_hidden, attention_weigths = self.decoder(input_seqs[:, j], dec_hidden, enc_output)
+            outputs, dec_hidden, attention_weights = self.decoder(input_seqs[:, j], dec_hidden, enc_output)
+            attention.append(attention_weights)
+
             results = np.apply_along_axis(get_action, axis = 1, arr = outputs, option = 'target')
             next_token = tf.reshape(results[:, 0], shape = (-1, 1))
             gen_seqs = np.concatenate([gen_seqs, next_token], axis = 1)
 
-        return gen_seqs
-
-# %%
+        if return_attention == True:
+            attention_stack = tf.stack(attention, axis = 1)
+            return gen_seqs, attention_stack
+        else:
+            return gen_seqs, None

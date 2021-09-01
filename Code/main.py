@@ -26,8 +26,8 @@ def get_params():
 
     import argparse
     parser = argparse.ArgumentParser(description='receive the parameters')
-    parser.add_argument('--language', type=str, required=True, help='type: korean or english')
-    parser.add_argument('--add_breakfast', type=str2bool, required=True, help='type: True or False')
+    # parser.add_argument('--language', type=str, required=True, help='type: korean or english')
+    # parser.add_argument('--add_breakfast', type=str2bool, required=True, help='type: True or False')
 
     parser.add_argument('--network', type=str, required=True, help='type: GRU or LSTM')
     parser.add_argument('--attention', type=str2bool, required=True, help='type: True or False')

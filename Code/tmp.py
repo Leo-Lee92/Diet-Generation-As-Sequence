@@ -161,6 +161,7 @@ julia_diets.to_csv('/home/messy92/Leo/Controlled_Sequence_Generation/Diet_Genera
 '''
 병렬처리
 '''
+from Code.util import get_score_pandas
 from multiprocessing import Pool
 import time
 import os
@@ -208,3 +209,48 @@ for proc in procs:
     proc.join()
 endTime = time.time()
 print("총 작업 시간", (endTime - startTime))
+
+
+
+# %%
+feature_data = pd.read_csv('../Data (new)/koreanDB/final_new_nutrition.csv', encoding='CP949')
+# diet_data_old = pd.read_csv('../Data (new)/koreanDB/new_diet (breakfast added + non_spec-checker).csv', encoding='CP949')    # non-spec_checker
+# diet_data_old = diet_data_old.iloc[:, :-1]
+diet_data_old = pd.read_csv('../Data (new)/koreanDB/final_new_diet (breakfast added + non_spec-checker).csv', encoding='CP949')    # non-spec_checker
+
+
+# Define parameters required for preprocessing
+preprocessing_kwargs = {    
+    'sequence_data' : diet_data_old,
+    'feature_data' : feature_data,
+    'integrate' : False,    
+
+    # Possible parameter list : ['or', 'arrange', 'correct1', 'correct2']
+    'DB_quality' : 'or'
+}
+
+# Preprocess nutrition data
+preprocess_nutrition = nutrition_preprocessor(**preprocessing_kwargs)
+nutrient_data, food_dict = preprocess_nutrition()
+
+# Preprocess diet data
+preprocess_diets_old = diet_sequence_preprocessor(**preprocessing_kwargs)
+diet_data_old_fin = preprocess_diets_old(nutrient_data)
+
+diet_data_old_np = food_to_token(diet_data_old_fin, nutrient_data, empty_delete = True, num_empty = 3)  # delete diets whose the empty token appears more than 3 times.
+
+
+# nutrient_vector = get_score_matrix(diet_data_old_np, food_dict, nutrient_data)
+nutrient_vector = get_score_pandas(diet_data_old_np, food_dict, nutrient_data)
+
+reward_list = np.apply_along_axis(get_reward_ver2, axis = 1, arr = nutrient_vector, done = 0, mode = True)
+reward_list[:, 0].mean()
+
+
+nutrient_data[nutrient_data['name'].isin(sequence_to_sentence(diet_data_old_np[:3, :].numpy(), food_dict)[0])].sum(axis = 0)
+
+list_of_diets = sequence_to_sentence(diet_data_old_np[:3, :].numpy(), food_dict)
+nutritions_of_diets = [nutrient_data[nutrient_data['name'].isin(each_diet)].sum(axis = 0)[1:] for each_diet in list_of_diets]
+np.array(nutritions_of_diets).reshape((diet_data_old_np[:3, :].shape[0], -1))
+
+# %%
