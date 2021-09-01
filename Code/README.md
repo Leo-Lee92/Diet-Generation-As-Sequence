@@ -10,7 +10,7 @@ The first study deals with our novel algortihm which combines REINFORCE algorith
 You can use our algorithm by directly running linux code:
 
 ```bash
-python3 main.py --language=korean  --add_breakfast=True --network=GRU --attention=True --embed_dim=128 --fc_dim=64 --learning=off-policy --policy=target --beta=True --buffer=True --buffer_size=30 --buffer_update=10 --num_epochs=40000 --lr=1e-3
+python3 main.py --network=GRU --attention=True --embed_dim=128 --fc_dim=64 --learning=off-policy --policy=target --beta=True --buffer=True --buffer_size=30 --buffer_update=10 --num_epochs=40000 --lr=1e-3
 ```
 where each arguments are parsed with command ```--args = option```. You can customize the option and can do the ablation study. The options of arguments are as below. Read the description written in ```kwargs``` dictionary, and change options according to the descriptions. 
 
