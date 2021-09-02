@@ -1259,7 +1259,7 @@ def plot_attention(sample_num, attention, sentence, predicted_sentence, food_dic
     ax.set_xlabel('Input text')
     ax.set_ylabel('Output text')
     # plt.suptitle('Attention weights')
-    plt.savefig('./figures/' + str(language) + '_attention_map(' + str(sample_num) +').png', dpi=300)
+    plt.savefig('./figures/' + str(language) + '_attention_map(' + str(sample_num) +').png', dpi=300, bbox_inches='tight')
 
 from scipy.spatial import distance
 def get_most_change_sequence(real_seqs, gen_seqs, top_n):

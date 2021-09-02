@@ -84,8 +84,8 @@ for batch in range(batch_num):
     print(' 생성 :', sequence_to_sentence([gen_seqs[0]], food_dict)[0])
     print(' ')
     print('In english')
-    print(' 정답 :', kor_to_eng(sequence_to_sentence(x.numpy(), food_dict)[0]), translate_dict)
-    print(' 생성 :', kor_to_eng(sequence_to_sentence([gen_seqs[0]], food_dict)[0]), translate_dict)
+    print(' 정답 :', kor_to_eng([sequence_to_sentence(x.numpy()[:, 1:x.shape[1] - 1], food_dict)[0]], translate_dict) )
+    print(' 생성 :', kor_to_eng([sequence_to_sentence(gen_seqs[:, 1:x.shape[1] - 1], food_dict)[0]], translate_dict) )
 
 # %%
 # Save the generated result
@@ -126,7 +126,7 @@ achievement_ratios.columns = ['expert', 'ML']
 achievement_ratios.index = ['energy', 'protein', 'fiber', 'vitaA', 'vitaC', 'vitaB1', 'vitaB2', 'calcium', 'iron', 'sodium', 'linoleic', r'$\alpha$-linolenic', '(%) carbo', '(%) protein', '(%) fat']
 achievement_ratios.plot.bar(rot = 90)
 plt.title('Achievement Rates per Nutrient')
-plt.savefig('./figures/achievement_ratios.png', dpi=300)
+plt.savefig('./figures/achievement_ratios.png', dpi=300, bbox_inches='tight')
 
 
 # # %%
