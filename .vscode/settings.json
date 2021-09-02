@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": "/home/messy92/.conda/envs/unist_server/bin/python"
+    "python.pythonPath": "/home/messy92/.conda/envs/unist_server/bin/python",
+    "jupyter.sendSelectionToInteractiveWindow": true,
+    "jupyter.jupyterServerType": "local"
 }
