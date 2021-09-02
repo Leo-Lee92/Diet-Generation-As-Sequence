@@ -172,7 +172,7 @@ achievement_ratios.plot.bar(rot = 90)
 ```
 and the visualized result is:
 
-<img src = "https://user-images.githubusercontent.com/61273017/131641545-471f0562-4cc9-485a-b5d3-cf6d00d4a456.png" width = 650>
+<img src = "https://user-images.githubusercontent.com/61273017/131641545-471f0562-4cc9-485a-b5d3-cf6d00d4a456.png" width = 450 height = 500>
 
 
 # **Usage of dietkit** to check *nutrition*, *ingredient* of generated diets. #
@@ -341,9 +341,9 @@ for i in top_chnage_idx:
 
 ## **(1) english version**
 
-<img src = "https://user-images.githubusercontent.com/61273017/131300637-a335292c-40e3-452c-944d-134f1d41f376.png" width = "650"><img src = "https://user-images.githubusercontent.com/61273017/131300641-c3e451da-7ab0-4993-a3d2-2cfb42fab18a.png" width = "650"><img src = "https://user-images.githubusercontent.com/61273017/131300643-291616c2-6528-4563-b69b-720e46376f83.png" width = "650"><img src = "https://user-images.githubusercontent.com/61273017/131300646-0c330451-a2e1-4a4d-9759-1b21684d41a6.png" width = "650">
+<img src = "https://user-images.githubusercontent.com/61273017/131300637-a335292c-40e3-452c-944d-134f1d41f376.png" width = "450"><img src = "https://user-images.githubusercontent.com/61273017/131300641-c3e451da-7ab0-4993-a3d2-2cfb42fab18a.png" width = "450"><img src = "https://user-images.githubusercontent.com/61273017/131300643-291616c2-6528-4563-b69b-720e46376f83.png" width = "450"><img src = "https://user-images.githubusercontent.com/61273017/131300646-0c330451-a2e1-4a4d-9759-1b21684d41a6.png" width = "450">
 
 ## **(2) korean version**
 
-<img src = https://user-images.githubusercontent.com/61273017/131300654-f1f53333-4c9c-4d2e-a6a6-c00ec5d66f55.png width = "650"><img src = https://user-images.githubusercontent.com/61273017/131300655-2361daf7-c297-4b28-ad2d-0d88d4d390a3.png width = "650"><img src = https://user-images.githubusercontent.com/61273017/131300656-48f757b1-b552-44c4-9e32-460c0f6872a0.png width = "650"><img src = https://user-images.githubusercontent.com/61273017/131300650-62093693-a5b0-4d9e-91d4-35d2ca8aeb3e.png width = "650"> 
+<img src = https://user-images.githubusercontent.com/61273017/131300654-f1f53333-4c9c-4d2e-a6a6-c00ec5d66f55.png width = "450"><img src = https://user-images.githubusercontent.com/61273017/131300655-2361daf7-c297-4b28-ad2d-0d88d4d390a3.png width = "450"><img src = https://user-images.githubusercontent.com/61273017/131300656-48f757b1-b552-44c4-9e32-460c0f6872a0.png width = "450"><img src = https://user-images.githubusercontent.com/61273017/131300450-62093693-a5b0-4d9e-91d4-35d2ca8aeb3e.png width = "450"> 
 
